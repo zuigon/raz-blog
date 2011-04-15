@@ -1,17 +1,17 @@
 load 'deploy' if respond_to?(:namespace)
 
-set :application, "blog"
+set :application, "raz-blog"
 set :user, "bkrsta"
 set :use_sudo, false
 
 set :scm, :git
-set :repository, "git@srv1:apps/blog.git"
+set :repository, "git://github.com/bkrsta/raz-blog.git"
 set :deploy_via, :checkout
-set :deploy_to, "/stor/www/public/bkrsta.co.cc/apps/#{application}"
+set :deploy_to, "/home/bkrsta/apps/#{application}"
 
-role :app, "srv1"
-role :web, "srv1"
-role :db, "srv1", :primary => true
+role :app, "vps1"
+role :web, "vps1"
+role :db, "vps1", :primary => true
 
 set :runner, user
 set :admin_runner, user
