@@ -1,0 +1,62 @@
+--- 
+title: FreeBSD pod XEN-om (DomU)
+date: 13/08/2010
+tags: freebsd, xen
+
+Novost kod FreeBSD 8 je stabilni ZFS (nije vise pod experimental) !
+8-CURRENT ima i stabilni XEN DomU support.
+
+Pokretanje FreeBSD-a pod XEN-om proslo mi je bez problema.
+
+Tutorial
+
+Gotov kernel, root image i XEN cfg nasao sam
+[ovdje](http://rock-y.org/uploads/freebsd/),
+gunzipao kernel i img i pokrenuo sa xm-om:
+
+    # xm cr freebsd-8.0p2-i386-xen-domu.cfg -c
+    Using config file "./freebsd-8.0p2-i386-xen-domu.cfg".
+    Started domain freebsd (id=30)
+    ...
+    Xen reported: 1596.166 MHz processor.
+    Timecounter "ixen" frequency 1000000000 Hz quality 0
+    CPU: Intel(R) Atom(TM) CPU 330 @ 1.60GHz (1596.17-MHz 686-class CPU)
+      Origin = "GenuineIntel"  Id = 0x106c2  Stepping = 2
+    ...
+
+Par trenutaka poslije:
+
+    FreeBSD/i386 (xenfreebsd) (xc0)
+    
+    login: root
+
+    ...
+    FreeBSD 8.0-RELEASE-p2 (XEN) #0: Mon Jan 11 23:44:02 UTC 2010
+    Welcome to FreeBSD!
+    
+    xenfreebsd# 
+
+OK, radi!
+
+Sad cu prebaciti image na pravu LVM particiju:
+
+    # ls freebsd-8.0p2-i386-xen-domu{.cfg,.img,-kernel}
+    freebsd-8.0p2-i386-xen-domu.cfg  freebsd-8.0p2-i386-xen-domu.img
+    freebsd-8.0p2-i386-xen-domu-kernel
+
+Velicina slike - stane na 1GB
+    # du -sh freebsd-8.0p2-i386-xen-domu.img 
+    257M	freebsd-8.0p2-i386-xen-domu.img
+
+Kreiram particiju od 300MB na LVM-u
+    # lvcreate -n freebsd1-root -L1MB vgblue
+
+DD-om kopiram sliku na kreiranu particiju
+    # dd if=freebsd-8.0p2-i386-xen-domu.img of=/dev/vgblue/freebsd1-root
+
+Root disk vise nije image file, pa cu promijeniti putanju diska u .cfg-u:  
+Umjesto linije:
+`disk = [ 'file:/home/xen/testing/freebsd/freebsd-8.0p2-i386-xen-domu.img,hda,w' ]`
+stavljam:
+`disk = [ 'phy:/dev/vgblue/freebsd1-root,hda,w' ]`
+

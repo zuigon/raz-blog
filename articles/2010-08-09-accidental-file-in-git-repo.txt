@@ -1,0 +1,22 @@
+--- 
+title: Accidental file in Git repo
+date: 09/08/2010
+tags: git
+
+I've accidentally put my password in public git repo... not pushed to remote, though.<br />
+I've removed it thanks to git's `filter-branch` command which 'rewrites the history', in my case, iterates
+through all commits in `master` branch and executes some code:
+
+    $ git filter-branch --tree-filter \
+      "export THEFILE=thin/production_config.yml; \
+       if [[ -e $THEFILE ]]; then
+         cat $THEFILE | \
+         sed 's/group: SECRET/group: users/g' > \
+         $THEFILE.new && mv $THEFILE.new $THEFILE
+       fi" master
+
+After this git creates backup of original objects in `.git/refs/original/`,<br />
+so I must `rm -rf .git/refs/original/`
+
+Finally do `git push origin master --force`<br /><br />
+For more info see: <a href="http://www.kernel.org/pub/software/scm/git/docs/git-filter-branch.html">`man git-filter-branch`</a>

@@ -1,0 +1,8 @@
+--- 
+title: nginx killed my server
+date: 08/08/2010
+tags: linux
+
+<code>Welcome to nginx!</code>
+
+said my web server after recompilation of nginx and 2 reboots after 40 days uptime because of miniature syntax error in /etc/init.d/nginx which caused endless bash processes opening

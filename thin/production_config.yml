@@ -1,0 +1,13 @@
+environment: production
+chdir: /home/bkrsta/apps/raz-blog/current
+address: 127.0.0.1
+user: bkrsta
+group: users
+port: 4001
+pid: /home/bkrsta/apps/raz-blog/current/tmp/pids/thin.pid
+rackup: /home/bkrsta/apps/raz-blog/current/config.ru
+log: /home/bkrsta/apps/raz-blog/current/log/thin.log
+max_conns: 1024
+timeout: 15
+max_persistent_conns: 512
+daemonize: true

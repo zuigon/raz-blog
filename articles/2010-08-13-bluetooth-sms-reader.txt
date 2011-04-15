@@ -1,0 +1,145 @@
+--- 
+title: Bluetooth SMS reader
+date: 13/08/2010
+tags: ruby, js
+github: bkrsta/btsms
+
+Da malo upogonim harvder izvan racunala u svoje opensource projekte, krenuh
+napraviti programcic za citanje (i slanje) SMS poruka (kasnije i ostalo...) s
+mobitela pomocu AT komandi
+([link][1]) (koje postoje od kraja
+70-ih i koriste se kod uredjaja kao sto su modemi i mobiteli).  
+(Stare Nokije imaju zgodnih stvari otvorenih korisniku)
+
+Odabir jezika je zasad [Ruby][5] dok ne naidjem na problem nerijesiv u njemu...
+
+Osobina vecine mobitela jest da ima Bluetooth, pored USB-a,
+pa da ne petljam s USB-om odlucio sam se prouciti Mac-ov
+Bluetooth sustav -- minimalna komplexnost;
+nakon pairinga mobitela s racunalom bitan je samo device:
+
+    /dev/tty.ImeMobitela-SerialPort
+
+Mac se spaja s mobitelom cim se "terminal client" spoji s deviceom.
+
+Za isprobavanje konekcije koristim `minicom` (`man minicom` ga opisuje sa:
+`friendly serial communication program`).<br>Minicom ima ncurses GUI
+(textualni GUI-like interface) menu za lakse configuriranje terminala i portova.
+
+Instalacija
+-----------
+
+Linux:  
+`$ apt-get install minicom`  
+OS X:  
+`$ sudo ports install minicom`  
+`$ brew install minicom` - Homebrew korisnici  
+
+Minicom Setup
+-------------
+
+Setup se otvara sa `minicom -s` 
+Pod "Serial port setup" u meniju postavio sam "Serial Device" na
+`/dev/tty.ImeMobitela-SerialPort` i baud rate na `38400` (za svaki slucaj),
+ostalo je po defaultu.  
+Te postavke spremio sam pod novi profil `eric`.
+`++` izgleda da je mob-ov terminal `ANSI`, pa sam i u minicom naveo
+
+Test konekcije
+--------------
+
+`minicom eric` otvara novu bluetooth sesiju s mobitelom, ako vec nije spojen.  
+Inicijalni output bi trebao izgledati slicno ovome:
+    AT S7=45 S0=0 L1 V1 X4 &c1 E1 Q0
+    OK
+Naravno, varijable se ne moraju podudarati.
+
+Nakon unosa `AT` pa enter, mobitel mora odgovoriti s `OK`, ako je spojen.  
+
+Programiranje
+-------------
+
+Prvo sto sam nasao za [Ruby][5] je ovaj [snippet][2]
+koji mi je mnogo pomogao, zapravo, i rijesio 70% problema.  
+Za pristupanje serijskom portu koristim gem `serialport`. (da nije njega morao
+bih pipe-ati kroz mozda `socat` i izmisljati alternative)
+`[!]` Kod nekih cudnih GSM modema koji imaju cudno ime u `/dev`-u moze
+biti potreban tweak C koda serialport modula.  
+
+Izvor s kojeg mob cita poruke odaberemo sa: `AT+CPMS=`  
+Listu izvora dobijemo sa: `AT+CPMS=?`  
+U mom slucaju output je: `+CPMS: ("ME","SM"),("ME","SM"),("ME","SM")`
+- `SM` je SIM kartica, a `ME` interni flash
+
+Sve poruke s mobitela uspjesno mogu dobiti komandom `AT+CMGL=4`
+(kod nekih je mobitela umjesto `4` ispravno i `"ALL"`)  
+Ali tu se javlja problem :)  
+On mi vraca poruke nedecodirane, tj. u PDU formatu i 7bitnom encodingu
+([primjer][3]) ...  
+
+Nasao sam gotovu JavaScript funkciju za bas to sto mi nedostaje - PDU
+dekodiranje - a jos je i pod GPL-om.  
+Ali je problem kako pokrenuti JavaScript kod unutar Rubyja?  
+
+ * postoji ruby-js projekt, koji je malo "neaktivan"
+ * Mozilla Rhino, javascript interpreter pisan u Javi, sto znaci da ce 
+   trebati neko vrijeme da se JavaVM pokrene...
+ * mozda koristiti [Node.JS][4]
+
+Mozda je najlakse preraditi gore navedeni JS kod u Ruby, ali ima dosta posla...
+
+I pored gomile C koda, pored Iconv-a, za baratanje bitovima stringova
+(konverzija enkodinga) moram se muciti s Rubyjem...  
+Zapravo, i ne moram, mogu SWIG-om kompajlirati C kod i koristiti ga kao
+modul u Rubyju ili pokretati C/[Perl][6] program vise puta sa `system ""`
+ili sa POpen4 iz Rubyja.  
+Moguce je koristiti [Perl][6] i njegov CPAN - ogromnu arhivu raznih modula koja
+sigurno vec ima nekakav septet-oktet konverter za GSM-7 encoding.
+
+Zapravo (`:)`), bilo bi zanimljivo prepisati sve u [Node.JS][4] i napraviti
+Web servis za citanje i slanje SMS-ova sa mobitela u blizini servera :)  
+Node.JS ima mnoga rjesenja za ovaj projekt.
+
+ * [Node.JS][4] je event oriented (koristi envents i callbacks) i radi asinkrono,
+   sto znaci da bi se mogao dobro iskoristiti da cita serijski port (bajt po
+   bajt) istovremeno dok komunicira preko HTTP-a (chunked encoding) s klijentom
+ * pisan je u JavaScripti
+ * ima HTTP, POSIX (Socket, File, Pipe, ...) i razne druge module
+
+S njim je moguce napraviti server (servis) koji daje Telnet pristup porukama
+i sluzi kao web servis koji se moze koristiti sa jQueryjem za management poruka
+kroz browser. Sa nesto cachiranja kroz REDIS moguce je dobiti zgodno rjesenje :)
+
+---
+
+**UPDATE**
+
+Rjesenje za koristenje JS koda iz Rubyja: _V8 engine_ (od Google-a)
+koji je, vjerujem, i najbrzi danas.
+
+Instalacija
+-----------
+    $ brew install v8
+
+Konzolu za debuggiranje i testiranje mozemo otvoriti sa `$ v8`
+
+**Rjesenje za decodiranje!**
+
+    :::ruby
+    decoded_message = `v8 pdu.js -e "getPDUMetaInfo('#{msg}')"`
+
+`time` komanda kaze:
+
+    v8 pdu.js -e "getPDUMetaInfo('a')"
+    0,01s user 0,01s system 61% cpu 0,021 total
+
+sto znaci da je ova metoda dovoljno brza za ovaj projekt.
+
+[**Link projekta**](http://github.com/bkrsta/btsms)
+
+[1]: http://en.wikipedia.org/wiki/Hayes_command_set "AT komande"
+[2]: http://snippets.dzone.com/posts/show/3647
+[3]: http://www.dreamfabric.com/sms/hello.html
+[4]: http://nodejs.org/ "Node.JS"
+[5]: http://www.ruby-lang.org/ "Ruby"
+[6]: http://www.perl.org/ "Perl"

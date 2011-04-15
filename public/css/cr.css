@@ -1,0 +1,44 @@
+.hidden { display: none; }
+.CR {
+  font-family: 'Courier New', 'Terminal', monospace;
+  color: #E6E0DB; padding: 3px 5px; overflow: auto;
+  font-size: 12px; margin: 12px 0; display: none;
+}
+.CR pre { margin: 0px; padding: 0px; }
+.CR a { color: #e6e0db; text-decoration: none; }
+
+.CR .an { color:#E7BE69 }                      /* html attribute */
+.CR .c  { color:#BC9358; font-style: italic; } /* comment */
+.CR .ch { color:#509E4F }                      /* escaped character */
+.CR .cl { color:#FFF }                         /* class */
+.CR .co { color:#FFF }                         /* constant */
+.CR .fl { color:#A4C260 }                      /* float */
+.CR .fu { color:#FFC56D }                      /* function */
+.CR .gv { color:#D0CFFE }                      /* global variable */
+.CR .i  { color:#A4C260 }                      /* integer */
+.CR .il { background:#151515 }                 /* inline code */
+.CR .iv { color:#D0CFFE }                      /* instance variable */
+.CR .pp { color:#E7BE69 }                      /* doctype */
+.CR .r  { color:#CB7832 }                      /* keyword */
+.CR .rx { color:#A4C260 }                      /* regex */
+.CR .s  { color:#A4C260 }                      /* string */
+.CR .sy { color:#6C9CBD }                      /* symbol */
+.CR .ta { color:#E7BE69 }                      /* html tag */
+.CR .pc { color:#6C9CBD }                      /* boolean */
+
+body {
+  background-color: #141414; color: #F8F8F8;
+  font-family: sans-serif, verdana, arial; margin: 0 auto;
+}
+.main { margin: 3.5em auto 0; display: table; overflow: hidden; }
+h1, h2, h3, h4, h5, h6 { color: #999; margin: 0; font-weight: bold; }
+h1 { font-size: 1.8em; }
+h2 { font-size: 1.5em; }
+h3 { font-size: 1.2em; }
+p { margin-bottom: 1em; }
+.clear { clear: both; }
+.code {
+	margin: 0; padding: 0 0 0 2px; font-family: 'Courier New', 'Terminal', monospace;
+	font-size: 2em; line-height: 1.3em; word-wrap: break-word; white-space: pre;
+	white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -o-pre-wrap;
+}

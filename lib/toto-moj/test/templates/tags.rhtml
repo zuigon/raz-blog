@@ -1,0 +1,14 @@
+<ul id="articles">
+  <% for article in articles %>
+    <li>
+      <%= article %>
+      <% if !article.tags.nil? %>
+      <ul id="tags">
+        <% for tag in article.tags %>
+          <li><%= tag %></li>
+        <% end %>
+      </ul>
+      <% end %>
+    </li>
+  <% end %>
+</ul>

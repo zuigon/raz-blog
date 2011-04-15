@@ -1,0 +1,17 @@
+#include <stdio.h>
+#include <3GimOs/math.h>
+
+int main(){
+  int  status = 404;
+  char kontakt[] = "bkrsta@gmail.com";
+  printf("Izrada bloga u tijeku...\n");
+  /*
+  * ovdje ce (mozda) biti primjeri
+  * zadataka iz informatike,
+  * pa i ostaloga
+  */
+
+  return status;
+}
+
+// => kontakt()

@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>::self</title>
+	<link rel="stylesheet" type="text/css" href="/css/cr.css" />
+	<script type="text/javascript" src="/js/jq.m.js" />
+	<script>
+  $(document).ready(function() {
+    $('div.CR').fadeIn(1000);
+    $("span.c:contains('show :hidden')").css("text-decoration", "underline").click(function() {
+      $('div.main > div.CR').fadeOut(500, function (){
+        $('div.main > div.CR').css('display', 'none'); $('div.hidden').fadeIn();
+      });
+    });
+    $("span.c:contains('go :back')").css("text-decoration", "underline").click(function() {
+      $('div.hidden').fadeOut(500, function(){ $('div.main > div.CR').fadeIn(); });
+    });
+    $("span.c:contains('kontakt')").css("text-decoration", "underline").click(function() {
+      window.open("mailto:<%= email %>?subject=<%= email_subj %>");
+    });
+  });
+  </script>
+</head>
+<body>
+  <div class="clear">&nbsp;</div>
+  <div class="container">
+    <div class="main">
+      <div class="clear">&nbsp;</div><div class="clear">&nbsp;</div>
+      <%= code %>
+    </div>
+  </div>
+<script type="text/javascript">
+  var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-17864271-1']); _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<section id="articles">
+  <% for article in articles %>
+    <article class="post small">
+      <header>
+        <h1><a href="<%= article.path %>"><%= article.title %></a></h1>
+        <span class="date"><%= article.date %></span>
+        <% if !article.tags.nil? %>
+          <span class="article_tags">
+            <% article.tags.each do |tag| %>
+            <a href="/tags/<%= tag %>"><%= tag %></a>
+            <% end %>
+          </span>
+        <% end %>
+      </header>
+    </article>
+  <% end %>
+</section>
